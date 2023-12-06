@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minesweeper</title>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+
+        td {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            vertical-align: middle;
+            border: 1px solid #000;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Minesweeper</h1>
+
+<table>
+    {% for row in range(rows) %}
+        <tr>
+            {% for col in range(cols) %}
+                <td id="{{ row }}_{{ col }}" class="cell" onclick="revealCell({{ row }}, {{ col }})">
+                    {% if revealed[row][col] %}
+                        {% if board[row][col] == 'X' %}
+                            <!-- Bomb is hidden, display an empty cell -->
+                            &nbsp;
+                        {% else %}
+                            <!-- Show the number of adjacent bombs -->
+                            {{ board[row][col] }}
+                        {% endif %}
+                    {% else %}
+                        <!-- Cell is not revealed, display nothing -->
+                        &nbsp;
+                    {% endif %}
+                </td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
+
+<script>
+    function revealCell(row, col) {
+        $.ajax({
+            type: 'POST',
+            url: '/reveal',
+            data: {row: row, col: col},
+            success: function(response) {
+                if (response.result) {
+                    updateBoard(response.board, response.revealed);
+                } else {
+                    alert('Game Over! You hit a mine.');
+                    location.reload();
+                }
+            }
+        });
+    }
+
+    function updateBoard(board, revealed) {
+        for (let row = 0; row < board.length; row++) {
+            for (let col = 0; col < board[row].length; col++) {
+                const cellId = '#' + row + '_' + col;
+                const cellValue = revealed[row][col] ? board[row][col] : '';
+                $(cellId).text(cellValue);
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
+
