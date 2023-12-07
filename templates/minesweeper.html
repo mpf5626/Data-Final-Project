@@ -107,3 +107,82 @@
         .catch(error => console.error('Error:', error));
     }
 </script>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Minesweeper</title>
+    <style>
+        /* Your CSS styles for the game grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat({{ cols }}, 30px); /* Adjust width as needed */
+            grid-template-rows: repeat({{ rows }}, 30px); /* Adjust height as needed */
+            gap: 1px; /* Gap between cells */
+        }
+        .cell {
+            width: 30px; /* Adjust cell width */
+            height: 30px; /* Adjust cell height */
+            background-color: #ccc; /* Default cell color */
+            border: 1px solid #999; /* Cell border */
+            text-align: center;
+            line-height: 30px; /* Center content vertically */
+        }
+    </style>
+</head>
+<body>
+    <div class="grid">
+        {% for row in range(rows) %}
+            {% for col in range(cols) %}
+                <div class="cell" id="cell-{{ row }}-{{ col }}" 
+                     onclick="revealCell({{ row }}, {{ col }})"
+                     oncontextmenu="flagCell(event, {{ row }}, {{ col }}); return false;">
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+    <script>
+        function revealCell(row, col) {
+            // Send an AJAX request to Flask to reveal the cell
+            fetch('/reveal', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `row=${row}&col=${col}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response from the backend
+                console.log('Cell revealed:', data);
+                // Update the UI based on the revealed cell
+                // You can modify the cell's appearance based on the revealed state
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function flagCell(event, row, col) {
+            event.preventDefault(); // Prevent default right-click behavior
+
+            // Send an AJAX request to Flask to flag the cell
+            fetch('/flag', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({row: row, col: col})
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response from the backend
+                console.log('Cell flagged:', data);
+                // Update the UI based on the flagged cell
+                // You can modify the cell's appearance for flagging
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
+
