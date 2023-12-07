@@ -57,6 +57,17 @@ def index():
     initialize_board()
     return render_template('minesweeper.html', rows=ROWS, cols=COLS, board=board, revealed=revealed)
 
+@app.route('/flag', methods=['POST'])
+def flag():
+    row = int(request.json['row'])
+    col = int(request.json['col'])
+
+    # Implement logic to flag the cell at (row, col)
+    # Update the board state to reflect the flagged cell
+
+    return jsonify({'message': 'Cell flagged', 'row': row, 'col': col})
+
+
 @app.route('/reveal', methods=['POST'])
 def reveal():
     row = int(request.form['row'])
