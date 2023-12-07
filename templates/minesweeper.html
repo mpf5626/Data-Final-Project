@@ -78,3 +78,32 @@
 </body>
 </html>
 
+<!-- Example cell in the game grid -->
+<div class="cell" id="cell-{{ row }}-{{ col }}" oncontextmenu="handleRightClick(event, {{ row }}, {{ col }}); return false;"></div>
+
+<script>
+    function handleRightClick(event, row, col) {
+        event.preventDefault(); // Prevent default right-click behavior
+
+        // Right-click detection
+        flagCell(row, col);
+    }
+
+    function flagCell(row, col) {
+        // Send an AJAX request to Flask to flag the cell as a potential mine
+        fetch('/flag', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({row: row, col: col})
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the response from the backend
+            console.log('Cell flagged:', data);
+            // Update the UI as needed
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
