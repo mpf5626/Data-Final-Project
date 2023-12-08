@@ -186,3 +186,71 @@
 </body>
 </html>
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Minesweeper</title>
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<table id="minesweeper-board">
+    <!-- Create your game board here -->
+    {% for row in board %}
+    <tr>
+        {% for cell in row %}
+        <td class="cell" data-row="{{ loop.index0 }}" data-col="{{ loop.index0 }}">{{ cell }}</td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+
+<script>
+    $(document).ready(function() {
+        // Function to reveal a cell on click
+        $('#minesweeper-board .cell').click(function() {
+            var row = $(this).data('row');
+            var col = $(this).data('col');
+
+            $.ajax({
+                url: '/reveal',
+                type: 'POST',
+                data: { row: row, col: col },
+                success: function(response) {
+                    // Handle the response from the server
+                    if (response.result) {
+                        // Update the UI with the revealed board
+                        // Replace the board content with response.board
+                        // Update revealed cells with response.revealed
+                    } else {
+                        // Handle game over scenario
+                    }
+                }
+            });
+        });
+
+        // Function to flag a cell on right-click (context menu)
+        $('#minesweeper-board .cell').contextmenu(function(e) {
+            e.preventDefault(); // Prevent default right-click menu
+
+            var row = $(this).data('row');
+            var col = $(this).data('col');
+
+            $.ajax({
+                url: '/flag',
+                type: 'POST',
+                data: JSON.stringify({ row: row, col: col }),
+                contentType: 'application/json',
+                success: function(response) {
+                    // Handle the response from the server
+                    // Update the UI to reflect the flagged cell
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
